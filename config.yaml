@@ -1,0 +1,84 @@
+logging:
+  version: 1
+  disable_existing_loggers: False
+
+  formatters:
+    simple:
+      format: "%(asctime)s %(message)s"
+      datefmt: "%Y-%m-%d %H:%M:%S"
+    error:
+      format: "%(asctime)s %(name)s %(levelname)s %(filename)s::%(funcName)s[%(lineno)d]:%(message)s"
+
+  handlers:
+    console:
+      class: logging.StreamHandler
+      level: INFO
+      formatter: simple
+      stream: ext://sys.stdout
+
+    info_file_handler:
+      class: logging.handlers.RotatingFileHandler
+      level: INFO
+      formatter: simple
+      filename: wx_info.log
+      maxBytes: 10485760  # 10MB
+      backupCount: 20
+      encoding: utf8
+
+    error_file_handler:
+      class: logging.handlers.RotatingFileHandler
+      level: ERROR
+      formatter: error
+      filename: wx_error.log
+      maxBytes: 10485760  # 10MB
+      backupCount: 20
+      encoding: utf8
+
+  root:
+    level: INFO
+    handlers: [console, info_file_handler, error_file_handler]
+
+groups:
+  enable: []  # 允许响应的群 roomId，大概长这样：2xxxxxxxxx3@chatroom
+
+news:
+  receivers: []  # 定时新闻接收人（roomid 或者 wxid）
+
+report_reminder:
+  receivers: []  # 定时日报周报月报提醒（roomid 或者 wxid）
+
+chatgpt:  # -----chatgpt配置这行不填-----
+  key:  # 填写你 ChatGPT 的 key
+  api: https://api.openai.com/v1  # 如果你不知道这是干嘛的，就不要改
+  model: gpt-3.5-turbo
+  proxy:  # 如果你在国内，你可能需要魔法，大概长这样：http://域名或者IP地址:端口号
+  prompt: 你是智能聊天机器人，你叫 wcferry  # 根据需要对角色进行设定
+
+chatglm:  # -----chatglm配置这行不填-----
+  key: sk-012345678901234567890123456789012345678901234567 # 这个应该不用动
+  api: http://localhost:8000/v1  # 根据自己的chatglm地址修改
+  proxy:  # 如果你在国内，你可能需要魔法，大概长这样：http://域名或者IP地址:端口号
+  prompt: 你是智能聊天机器人，你叫小薇  # 根据需要对角色进行设定 
+  file_path: F:/Pictures/temp  #设定生成图片和代码使用的文件夹路径
+
+tigerbot:  # -----tigerbot配置这行不填-----
+  key:  # key
+  model:  # tigerbot-7b-sft
+
+xinghuo_web:  # -----讯飞星火web模式api配置这行不填 抓取方式详见文档：https://www.bilibili.com/read/cv27066577-----
+  cookie:  di_c_mti=bdd487e4-5ec0-6646-b381-63aa0fb5942a; d_d_app_ver=1.4.0; _gcl_au=1.1.1063281607.1719281985; gr_user_id=dd2603e1-87c0-48af-9a37-83ca6a04df38; _ga=GA1.1.1524395997.1719281985; _uetvid=05b4be30329a11ef9de1535cf8fa9c2e; _clck=fqua7n%7C2%7Cfmx%7C0%7C1637; _ga_0KHV9JM0VW=GS1.1.1719360343.2.0.1719360343.60.0.0; d_d_ci=cc251e7e-3ad8-6a9c-886a-a8c893c25a0a; Hm_lvt_fe740601c79b0c00b6d5458d146aa5ef=1719281987,1720065195; Hm_lvt_83a57cc9e205b0add91afc6c4f0babcc=1720065251; daas_st={%22sdk_ver%22:%221.3.9%22%2C%22status%22:%220%22}; appid=150b4dfebe; ssoSessionId=99ab44d9-eb84-477d-ac06-bb809f4b83aa; account_id=19055608744; ui=19055608744; gt_local_id=YdNkDNmMZrVRa7rF2y37DBr6vB5PhomHoCGFrbj9Ppjd2a1UuNMIwA==
+  fd:  772985
+  GtToken:  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
+  prompt: 你是智能聊天机器人，你叫 wcferry。请用这个角色回答我的问题  # 根据需要对角色进行设定
+
+bard: # -----bard配置这行不填-----
+  api_key: # api-key 创建地址：https://ai.google.dev/pricing?hl=en，创建后复制过来即可  
+  model_name: gemini-pro # 新模型上线后可以选择模型
+  proxy: http://127.0.0.1:7890  # 如果你在国内，你可能需要魔法，大概长这样：http://域名或者IP地址:端口号
+  # 提示词尽可能用英文，bard对中文提示词的效果不是很理想，下方提示词为英语老师的示例，请按实际需要修改,默认设置的提示词为谷歌创造的AI大语言模型
+  # I want you to act as a spoken English teacher and improver. I will speak to you in English and you will reply to me in English to practice my spoken English. I want you to keep your reply neat, limiting the reply to 100 words. I want you to strictly correct my grammar mistakes, typos, and factual errors. I want you to ask me a question in your reply. Now let's start practicing, you could ask me a question first. Remember, I want you to strictly correct my grammar mistakes, typos, and factual errors.
+  prompt: You am a large language model, trained by Google.
+
+zhipu:  # -----zhipu配置这行不填-----
+  api_key:  #api key
+  model:   # 模型类型
