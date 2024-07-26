@@ -6,6 +6,7 @@ import time
 import xml.etree.ElementTree as ET
 from queue import Empty
 from threading import Thread
+
 from base.func_zhipu import ZhiPu
 
 from wcferry import Wcf, WxMsg
@@ -20,6 +21,8 @@ from base.func_xinghuo_web import XinghuoWeb
 from configuration import Config
 from constants import ChatType
 from job_mgmt import Job
+
+from huasheng_processing import huasheng_processing
 
 __version__ = "39.0.10.1"
 
@@ -81,7 +84,12 @@ class Robot(Job):
         :param msg: 微信消息结构
         :return: 处理状态，`True` 成功，`False` 失败
         """
-        return self.toChitchat(msg)
+        hp = huasheng_processing(msg.content)
+        hpAnswer = hp.processingAtMsg()
+        self.sendTextMsg(hpAnswer,msg.roomid)
+        return True
+
+        #return self.toChitchat(msg)
 
     def toChengyu(self, msg: WxMsg) -> bool:
         """

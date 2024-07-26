@@ -9,6 +9,9 @@ from configuration import Config
 from constants import ChatType
 from robot import Robot, __version__
 from wcferry import Wcf
+from flask import Flask, jsonify, request
+
+app = Flask(__name__)
 
 
 def weather_report(robot: Robot) -> None:
@@ -54,6 +57,36 @@ def main(chat_type: int):
 
     # 每天 16:30 提醒发日报周报月报
     robot.onEveryTime("16:30", ReportReminder.remind, robot=robot)
+
+    print("启动端口")
+
+    @app.route('/api/help/getAllContacts')
+    def api_getAllContacts():
+        '''
+        获取所有联系人
+        '''
+        allContacts = robot.getAllContacts()
+        return jsonify(allContacts)
+
+    @app.route('/api/sendTextMsg', methods=["GET"])
+    def api_sendTextMsg():
+        '''
+        给好友发送消息
+        '''
+        get_data = request.args
+        robot.sendTextMsg(get_data.get('msg'), get_data.get('receiver'), get_data.get('at_list'))
+        return '发送完成'
+
+    @app.route('/api/sendTextMsg2', methods=["POST"])
+    def api_sendTextMsg2():
+        '''
+        给好友发送消息
+        '''
+        get_data = request.json
+        robot.sendTextMsg(get_data.get('msg'), get_data.get('receiver'), get_data.get('at_list'))
+        return '发送完成'
+
+    app.run(host='0.0.0.0', port=5000)
 
     # 让机器人一直跑
     robot.keepRunningAndBlockProcess()
