@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import logging
+import os.path
 import re
 import time
 import xml.etree.ElementTree as ET
@@ -175,7 +176,58 @@ class Robot(Job):
                     self.config.reload()
                     self.LOG.info("已更新")
             else:
-                self.toChitchat(msg)  # 闲聊
+                if str(msg.content).startswith('请转发：'):
+                    # 消息以群发开头，进行群转发
+                    for contact in self.allContacts:
+                        if contact.endswith('@chatroom'):
+                            # 判断群聊
+                            a = 1
+                            b = 0
+                            while a != 0 and b < 5:
+                                time.sleep(2)
+                                a = self.wcf.send_text(str(msg.content)[4:], contact)
+                                b = b + 1
+                                print(a)
+                else:
+                    self.toChitchat(msg)  # 闲聊
+
+        elif msg.type == 49:  # 小程序
+            print('-----------------------')
+            print(msg.content)
+            print('-----------------')
+            # 群聊的不处理
+            if '<![CDATA[邀请你加入群聊]]>' in msg.content:
+                print('群聊邀请，不处理')
+            else:
+                # 将小程序转发
+                for contact in self.allContacts:
+                    if contact.endswith('@chatroom'):
+                        # 判断群聊
+                        a = 0
+                        b = 0
+                        while a != 1 and b < 5:
+                            time.sleep(2)
+                            a = self.wcf.forward_msg(msg.id, contact)
+                            b = b + 1
+                            print(a)
+
+        elif msg.type == 3: # 图片
+            # 下载图片
+            imgDir = 'C:\\wxImg'
+            if not os.path.exists(imgDir):
+                os.makedirs(imgDir)
+            imgPath = self.wcf.download_image(msg.id,msg.extra,imgDir)
+            # 将图片转发
+            for contact in self.allContacts:
+                if contact.endswith('@chatroom'):
+                    # 判断群聊
+                    a = 1
+                    b = 0
+                    while a != 0 and b < 5:
+                        time.sleep(2)
+                        a = self.wcf.send_image(imgPath, contact)
+                        b = b + 1
+                        print(a)
 
     def onMsg(self, msg: WxMsg) -> int:
         try:
