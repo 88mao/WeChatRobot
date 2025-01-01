@@ -39,7 +39,7 @@ logging:
     handlers: [console, info_file_handler, error_file_handler]
 
 groups:
-  enable: ['46209179585@chatroom']  # 允许响应的群 roomId，大概长这样：2xxxxxxxxx3@chatroom
+  enable: ['46209179585@chatroom','12480213853@chatroom']  # 允许响应的群 roomId，大概长这样：2xxxxxxxxx3@chatroom
 
 news:
   receivers: []  # 定时新闻接收人（roomid 或者 wxid）
