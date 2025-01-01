@@ -68,6 +68,14 @@ def main(chat_type: int):
         allContacts = robot.getAllContacts()
         return jsonify(allContacts)
 
+    @app.route('/api/help/getAllGroupContacts')
+    def api_getAllGroupContacts():
+        '''
+        获取所有群
+        '''
+        allGroupContacts = robot.getAllGroupContacts()
+        return jsonify(allGroupContacts)
+
     @app.route('/api/sendTextMsg', methods=["GET"])
     def api_sendTextMsg():
         '''

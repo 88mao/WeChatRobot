@@ -38,6 +38,7 @@ class Robot(Job):
         self.LOG = logging.getLogger("Robot")
         self.wxid = self.wcf.get_self_wxid()
         self.allContacts = self.getAllContacts()
+        self.groupContacts = self.getAllGroupContacts()
 
         if ChatType.is_in_chat_types(chat_type):
             if chat_type == ChatType.TIGER_BOT.value and TigerBot.value_check(self.config.TIGERBOT):
@@ -178,16 +179,15 @@ class Robot(Job):
             else:
                 if str(msg.content).startswith('请转发：'):
                     # 消息以群发开头，进行群转发
-                    for contact in self.allContacts:
-                        if contact.endswith('@chatroom'):
-                            # 判断群聊
-                            a = 1
-                            b = 0
-                            while a != 0 and b < 5:
-                                time.sleep(2)
-                                a = self.wcf.send_text(str(msg.content)[4:], contact)
-                                b = b + 1
-                                print(a)
+                    for contact in self.groupContacts:
+                        print(contact)
+                        a = 1
+                        b = 0
+                        while a != 0 and b < 5:
+                            time.sleep(2)
+                            a = self.wcf.send_text(str(msg.content)[4:], contact)
+                            b = b + 1
+                            print(a)
                 else:
                     self.toChitchat(msg)  # 闲聊
 
@@ -200,16 +200,15 @@ class Robot(Job):
                 print('群聊邀请，不处理')
             else:
                 # 将小程序转发
-                for contact in self.allContacts:
-                    if contact.endswith('@chatroom'):
-                        # 判断群聊
-                        a = 0
-                        b = 0
-                        while a != 1 and b < 5:
-                            time.sleep(2)
-                            a = self.wcf.forward_msg(msg.id, contact)
-                            b = b + 1
-                            print(a)
+                for contact in self.groupContacts:
+                    print(contact)
+                    a = 0
+                    b = 0
+                    while a != 1 and b < 5:
+                        time.sleep(2)
+                        a = self.wcf.forward_msg(msg.id, contact)
+                        b = b + 1
+                        print(a)
 
         elif msg.type == 3: # 图片
             # 下载图片
@@ -218,16 +217,15 @@ class Robot(Job):
                 os.makedirs(imgDir)
             imgPath = self.wcf.download_image(msg.id,msg.extra,imgDir)
             # 将图片转发
-            for contact in self.allContacts:
-                if contact.endswith('@chatroom'):
-                    # 判断群聊
-                    a = 1
-                    b = 0
-                    while a != 0 and b < 5:
-                        time.sleep(2)
-                        a = self.wcf.send_image(imgPath, contact)
-                        b = b + 1
-                        print(a)
+            for contact in self.groupContacts:
+                print(contact)
+                a = 1
+                b = 0
+                while a != 0 and b < 5:
+                    time.sleep(2)
+                    a = self.wcf.send_image(imgPath, contact)
+                    b = b + 1
+                    print(a)
 
     def onMsg(self, msg: WxMsg) -> int:
         try:
@@ -288,6 +286,18 @@ class Robot(Job):
         """
         contacts = self.wcf.query_sql("MicroMsg.db", "SELECT UserName, NickName FROM Contact;")
         return {contact["UserName"]: contact["NickName"] for contact in contacts}
+
+    def getAllGroupContacts(self) -> dict:
+        """
+        获取联系人（包括好友、公众号、服务号、群成员……）
+        格式: {"wxid": "NickName"}
+        """
+        contacts = self.wcf.query_sql("MicroMsg.db", "SELECT UserName, NickName FROM Contact;")
+        groupContacts = {}
+        for contact in contacts:
+            if str(contact['UserName']).endswith('@chatroom'):
+                groupContacts[contact["UserName"]] = contact["NickName"]
+        return groupContacts
 
     def keepRunningAndBlockProcess(self) -> None:
         """
