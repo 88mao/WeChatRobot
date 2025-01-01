@@ -82,3 +82,7 @@ bard: # -----bard配置这行不填-----
 zhipu:  # -----zhipu配置这行不填-----
   api_key:  #api key
   model:   # 模型类型
+
+huasheng:
+  promotion:
+    disenable: ['12480213853@chatroom','17320585253@chatroom','50129479654@chatroom']  # 华盛推广排除的群

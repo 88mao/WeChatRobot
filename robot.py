@@ -180,14 +180,15 @@ class Robot(Job):
                 if str(msg.content).startswith('请转发：'):
                     # 消息以群发开头，进行群转发
                     for contact in self.groupContacts:
-                        print(contact)
-                        a = 1
-                        b = 0
-                        while a != 0 and b < 5:
-                            time.sleep(2)
-                            a = self.wcf.send_text(str(msg.content)[4:], contact)
-                            b = b + 1
-                            print(a)
+                        if contact not in self.config.HuashengPromotionDisenable:
+                            print(contact)
+                            a = 1
+                            b = 0
+                            while a != 0 and b < 5:
+                                time.sleep(2)
+                                a = self.wcf.send_text(str(msg.content)[4:], contact)
+                                b = b + 1
+                                print(a)
                 else:
                     self.toChitchat(msg)  # 闲聊
 
@@ -201,14 +202,15 @@ class Robot(Job):
             else:
                 # 将小程序转发
                 for contact in self.groupContacts:
-                    print(contact)
-                    a = 0
-                    b = 0
-                    while a != 1 and b < 5:
-                        time.sleep(2)
-                        a = self.wcf.forward_msg(msg.id, contact)
-                        b = b + 1
-                        print(a)
+                    if contact not in self.config.HuashengPromotionDisenable:
+                        print(contact)
+                        a = 0
+                        b = 0
+                        while a != 1 and b < 5:
+                            time.sleep(2)
+                            a = self.wcf.forward_msg(msg.id, contact)
+                            b = b + 1
+                            print(a)
 
         elif msg.type == 3: # 图片
             # 下载图片
@@ -218,14 +220,15 @@ class Robot(Job):
             imgPath = self.wcf.download_image(msg.id,msg.extra,imgDir)
             # 将图片转发
             for contact in self.groupContacts:
-                print(contact)
-                a = 1
-                b = 0
-                while a != 0 and b < 5:
-                    time.sleep(2)
-                    a = self.wcf.send_image(imgPath, contact)
-                    b = b + 1
-                    print(a)
+                if contact not in self.config.HuashengPromotionDisenable:
+                    print(contact)
+                    a = 1
+                    b = 0
+                    while a != 0 and b < 5:
+                        time.sleep(2)
+                        a = self.wcf.send_image(imgPath, contact)
+                        b = b + 1
+                        print(a)
 
     def onMsg(self, msg: WxMsg) -> int:
         try:
