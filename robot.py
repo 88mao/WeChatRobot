@@ -296,11 +296,11 @@ class Robot(Job):
         格式: {"wxid": "NickName"}
         """
         contacts = self.wcf.query_sql("MicroMsg.db", "SELECT UserName, NickName FROM Contact;")
-        groupContacts = {}
+        self.groupContacts = {}
         for contact in contacts:
             if str(contact['UserName']).endswith('@chatroom'):
-                groupContacts[contact["UserName"]] = contact["NickName"]
-        return groupContacts
+                self.groupContacts[contact["UserName"]] = contact["NickName"]
+        return self.groupContacts
 
     def keepRunningAndBlockProcess(self) -> None:
         """
