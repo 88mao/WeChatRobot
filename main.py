@@ -13,22 +13,6 @@ from flask import Flask, jsonify, request
 
 app = Flask(__name__)
 
-
-def weather_report(robot: Robot) -> None:
-    """模拟发送天气预报
-    """
-
-    # 获取接收人
-    receivers = ["filehelper"]
-
-    # 获取天气，需要自己实现，可以参考 https://gitee.com/lch0821/WeatherScrapy 获取天气。
-    report = "这就是获取到的天气情况了"
-
-    for r in receivers:
-        robot.sendTextMsg(report, r)
-        # robot.sendTextMsg(report, r, "notify@all")   # 发送消息并@所有人
-
-
 def main(chat_type: int):
     config = Config()
     wcf = Wcf(debug=True)
@@ -43,14 +27,22 @@ def main(chat_type: int):
     robot.LOG.info(f"WeChatRobot【{__version__}】成功启动···")
 
     # 机器人启动发送测试消息
-    robot.sendTextMsg("机器人启动成功！", "filehelper")
+    robot.sendTextMsg("机器人启动成功！\n"
+                     "绘画功能使用说明：\n"
+                     "• 智谱绘画：牛智谱[描述]\n"
+                     "• 阿里绘画：牛阿里[描述]\n"
+                     "• 谷歌绘画：牛谷歌[描述]\n"
+                     "实例：\n"
+                     "牛阿里 画一张家乡\n"
+                     "@XX 牛阿里 画一张家乡\n"
+                     "聊天时直接发送消息即可", "filehelper")
 
     # 接收消息
     # robot.enableRecvMsg()     # 可能会丢消息？
     robot.enableReceivingMsg()  # 加队列
 
     # 每天 7 点发送天气预报
-    robot.onEveryTime("07:00", weather_report, robot=robot)
+    robot.onEveryTime("07:00", robot.weatherReport)
 
     # 每天 7:30 发送新闻
     robot.onEveryTime("07:30", robot.newsReport)

@@ -1,7 +1,7 @@
 # WeChatRobot
 一个基于 [WeChatFerry](https://github.com/lich0821/WeChatFerry) 的微信机器人示例。
 
-|[📖 文档](https://wechatferry.readthedocs.io/)|[📺 视频教程](https://mp.weixin.qq.com/s/APdjGyZ2hllXxyG_sNCfXQ)|[🙋 FAQ](https://mp.weixin.qq.com/s/Y2Q37VYV730Iu9TrgiCmCw)|[🚨【微信机器人】沙雕行为合集](https://mp.weixin.qq.com/s/mc8O5iuhy46X4Bgqs80E8g)|
+|[📖 文档](https://wechatferry.readthedocs.io/)|[📺 视频教程](https://mp.weixin.qq.com/s/APdjGyZ2hllXxyG_sNCfXQ)|[🙋 FAQ](https://mp.weixin.qq.com/s/GDDULcaMGjiS_TnOI6pvLw)|[🚨【微信机器人】沙雕行为合集](https://mp.weixin.qq.com/s/mc8O5iuhy46X4Bgqs80E8g)|
 |:-:|:-:|:-:|:-:|
 
 |![碲矿](https://s2.loli.net/2023/09/25/fub5VAPSa8srwyM.jpg)|![赞赏](https://s2.loli.net/2023/09/25/gkh9uWZVOxzNPAX.jpg)|
@@ -14,7 +14,7 @@
     - 按照步骤来，版本保持一致，少走弯路。
     - 按照步骤来，版本保持一致，少走弯路。
 1. 安装 Python>=3.9（Python 12 需要自己编译依赖，慎选），例如 [3.10.11](https://www.python.org/ftp/python/3.10.11/python-3.10.11-amd64.exe)
-2. 安装微信 `3.9.10.27`，下载地址在 [这里](https://github.com/lich0821/WeChatRobot/releases/latest) 找到。
+2. 安装微信对应版本，下载地址在 [这里](https://github.com/lich0821/WeChatFerry/releases/latest) 找到。
 3. 克隆项目
 ```sh
 git clone https://github.com/lich0821/WeChatRobot.git
@@ -31,6 +31,8 @@ git clone https://gitee.com/lch0821/WeChatRobot.git
 python -m pip install -U pip
 # 安装必要依赖
 pip install -r requirements.txt
+# 国内用户可能会因为网络问题出现安装失败，届时可使用镜像源来下载
+pip install -i https://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com -r requirements.txt
 # ChatGLM 还需要安装一个 kernel
 ipython kernel install --name chatglm3 --user
 ```
@@ -140,7 +142,25 @@ bard: # -----bard配置这行不填-----
   # 提示词尽可能用英文，bard对中文提示词的效果不是很理想，下方提示词为英语老师的示例，请按实际需要修改,默认设置的提示词为谷歌创造的AI大语言模型
   # I want you to act as a spoken English teacher and improver. I will speak to you in English and you will reply to me in English to practice my spoken English. I want you to keep your reply neat, limiting the reply to 100 words. I want you to strictly correct my grammar mistakes, typos, and factual errors. I want you to ask me a question in your reply. Now let's start practicing, you could ask me a question first. Remember, I want you to strictly correct my grammar mistakes, typos, and factual errors.
   prompt: You am a large language model, trained by Google.
+
+deepseek: sk-xxxxxxxxxxxxxxx # -----deepseek配置这行不填-----
+  #思维链相关功能默认关闭，开启后会增加响应时间和消耗更多的token
+  key:  # 填写你的 DeepSeek API Key
+  api: https://api.deepseek.com  # DeepSeek API 地址
+  model: deepseek-chat  # 可选: deepseek-chat (DeepSeek-V3), deepseek-reasoner (DeepSeek-R1)
+  prompt: 你是智能聊天机器人，你叫 DeepSeek 助手  # 根据需要对角色进行设定
+  enable_reasoning: false  # 是否启用思维链功能，仅在使用 deepseek-reasoner 模型时有效
+  show_reasoning: false  # 是否在回复中显示思维过程，仅在启用思维链功能时有效
 ```
+
+## 至开发者
+```
+在接入图片生成的相关功能时，可将调用文件放入image文件夹内。
+在 image/__init__.py 文件内加入对应的模块儿，以便作为Python包来调用。
+在 configuration.py 内也要加入相关的代码，否则会初始化失败。
+文生图相关功能，全部默认开启，如果均未配置，全部转接至语言大模型。
+```
+[文生图功能的使用说明](./image/文生图功能的使用说明.MD)
 
 ## HTTP
 如需要使用 HTTP 接口，请参考：

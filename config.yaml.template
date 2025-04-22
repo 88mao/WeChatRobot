@@ -25,6 +25,15 @@ logging:
       backupCount: 20
       encoding: utf8
 
+    warning_file_handler:
+      class: logging.handlers.RotatingFileHandler
+      level: WARNING
+      formatter: simple
+      filename: wx_warning.log
+      maxBytes: 10485760  # 10MB
+      backupCount: 20
+      encoding: utf8
+
     error_file_handler:
       class: logging.handlers.RotatingFileHandler
       level: ERROR
@@ -40,12 +49,20 @@ logging:
 
 groups:
   enable: []  # 允许响应的群 roomId，大概长这样：2xxxxxxxxx3@chatroom
+  welcome_msg: "欢迎 {new_member} 加入群聊！\n请简单介绍一下自己吧~\n如果想和我聊天，可以@我"  # 新人入群欢迎消息，可使用{new_member}和{inviter}变量
 
 news:
-  receivers: []  # 定时新闻接收人（roomid 或者 wxid）
+  receivers: ["filehelper"]  # 定时新闻接收人（roomid 或者 wxid）
 
 report_reminder:
   receivers: []  # 定时日报周报月报提醒（roomid 或者 wxid）
+
+# 消息发送速率限制：一分钟内最多发送6条消息
+send_rate_limit: 6
+
+weather:  # -----天气提醒配置这行不填-----
+  city_code: 101010100 # 北京城市代码，如若需要其他城市，可参考base/main_city.json或者自寻城市代码填写
+  receivers: ["filehelper"]  # 天气提醒接收人（roomid 或者 wxid）
 
 chatgpt:  # -----chatgpt配置这行不填-----
   key:  # 填写你 ChatGPT 的 key
@@ -55,11 +72,17 @@ chatgpt:  # -----chatgpt配置这行不填-----
   prompt: 你是智能聊天机器人，你叫 wcferry  # 根据需要对角色进行设定
 
 chatglm:  # -----chatglm配置这行不填-----
-  key: sk-012345678901234567890123456789012345678901234567 # 这个应该不用动
+  key: # 这个应该不用动
   api: http://localhost:8000/v1  # 根据自己的chatglm地址修改
   proxy:  # 如果你在国内，你可能需要魔法，大概长这样：http://域名或者IP地址:端口号
-  prompt: 你是智能聊天机器人，你叫小薇  # 根据需要对角色进行设定 
+  prompt: 你是智能聊天机器人，你叫小薇  # 根据需要对角色进行设定
   file_path: F:/Pictures/temp  #设定生成图片和代码使用的文件夹路径
+
+ollama:  # -----ollama配置这行不填-----
+  enable: true  # 是否启用 ollama
+  model: deepseek-r1:1.5b # ollama-7b-sft
+  prompt: 你是智能聊天机器人，你叫 梅好事  # 根据需要对角色进行设定
+  file_path: d:/pictures/temp  #设定生成图片和代码使用的文件夹路径
 
 tigerbot:  # -----tigerbot配置这行不填-----
   key:  # key
@@ -72,7 +95,7 @@ xinghuo_web:  # -----讯飞星火web模式api配置这行不填 抓取方式详�
   prompt: 你是智能聊天机器人，你叫 wcferry。请用这个角色回答我的问题  # 根据需要对角色进行设定
 
 bard: # -----bard配置这行不填-----
-  api_key: # api-key 创建地址：https://ai.google.dev/pricing?hl=en，创建后复制过来即可  
+  api_key: # api-key 创建地址：https://ai.google.dev/pricing?hl=en，创建后复制过来即可
   model_name: gemini-pro # 新模型上线后可以选择模型
   proxy: http://127.0.0.1:7890  # 如果你在国内，你可能需要魔法，大概长这样：http://域名或者IP地址:端口号
   # 提示词尽可能用英文，bard对中文提示词的效果不是很理想，下方提示词为英语老师的示例，请按实际需要修改,默认设置的提示词为谷歌创造的AI大语言模型
@@ -82,3 +105,50 @@ bard: # -----bard配置这行不填-----
 zhipu:  # -----zhipu配置这行不填-----
   api_key:  #api key
   model:   # 模型类型
+
+deepseek:  # -----deepseek配置这行不填-----
+  #思维链相关功能默认关闭，开启后会增加响应时间和消耗更多的token
+  key:  # 填写你的 DeepSeek API Key API Key的格式为sk-xxxxxxxxxxxxxxx
+  api: https://api.deepseek.com  # DeepSeek API 地址
+  model: deepseek-chat  # 可选: deepseek-chat (DeepSeek-V3), deepseek-reasoner (DeepSeek-R1)
+  prompt: 你是智能聊天机器人，你叫 DeepSeek 助手  # 根据需要对角色进行设定
+  enable_reasoning: false  # 是否启用思维链功能，仅在使用 deepseek-reasoner 模型时有效
+  show_reasoning: false  # 是否在回复中显示思维过程，仅在启用思维链功能时有效
+
+cogview:  # -----智谱AI图像生成配置这行不填-----
+  # 此API请参考 https://www.bigmodel.cn/dev/api/image-model/cogview
+  enable: False  # 是否启用图像生成功能，默认关闭，将False替换为true则开启，此模型可和其他模型同时运行。
+  api_key:  # 智谱API密钥，请填入您的API Key
+  model: cogview-4-250304  # 模型编码，可选：cogview-4-250304、cogview-4、cogview-3-flash
+  quality: standard  # 生成质量，可选：standard（快速）、hd（高清）
+  size: 1024x1024  # 图片尺寸，可自定义，需符合条件
+  trigger_keyword: 牛智谱  # 触发图像生成的关键词
+  temp_dir:  # 临时文件存储目录，留空则默认使用项目目录下的zhipuimg文件夹，如果要更改，例如 D:/Pictures/temp 或 /home/user/temp
+  fallback_to_chat: true  # 当未启用绘画功能时：true=将请求发给聊天模型处理，false=回复固定的未启用提示信息
+
+aliyun_image:  # -----如果要使用阿里云文生图，取消下面的注释并填写相关内容，模型到阿里云百炼找通义万相-文生图2.1-Turbo-----
+  enable: true  # 是否启用阿里文生图功能，false为关闭，默认开启，如果未配置，则会将消息发送给聊天大模型
+  api_key: sk-xxxxxxxxxxxxxxxxxxxxxxxx  # 替换为你的DashScope API密钥
+  model: wanx2.1-t2i-turbo  # 模型名称，默认使用wanx2.1-t2i-turbo(快),wanx2.1-t2i-plus（中）,wanx-v1（慢），会给用户不同的提示！
+  size: 1024*1024  # 图像尺寸，格式为宽*高
+  n: 1  # 生成图像的数量
+  temp_dir: ./temp  # 临时文件存储路径
+  trigger_keyword: 牛阿里  # 触发词，默认为"牛阿里"
+  fallback_to_chat: true  # 当服务不可用时是否转发给聊天模型处理
+
+gemini_image:  # -----谷歌AI画图配置这行不填-----
+  enable: true  # 是否启用谷歌AI画图功能
+  api_key:  # 谷歌Gemini API密钥，必填
+  model: gemini-2.0-flash-exp-image-generation  # 模型名称，建议保持默认，只有这一个模型可以进行绘画
+  temp_dir: ./geminiimg  # 图片保存目录，可选
+  trigger_keyword: 牛谷歌  # 触发词，默认为"牛谷歌"
+  fallback_to_chat: false  # 未启用时是否回退到聊天模式
+  proxy: http://127.0.0.1:7890  # 使用Clash代理，格式为：http://域名或者IP地址:端口号
+
+perplexity:  # -----perplexity配置这行不填-----
+  key:  # 填写你的Perplexity API Key
+  api: https://api.perplexity.ai  # API地址
+  proxy:  # 如果你在国内，你可能需要魔法，大概长这样：http://域名或者IP地址:端口号
+  model: mixtral-8x7b-instruct  # 可选模型包括：sonar-small-chat, sonar-medium-chat, sonar-pro, mixtral-8x7b-instruct等
+  prompt: 你是Perplexity AI助手，请用专业、准确、有帮助的方式回答问题  # 角色设定
+  trigger_keyword: ask  # 触发Perplexity服务的前置词
